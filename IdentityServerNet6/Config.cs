@@ -99,9 +99,20 @@ namespace IdentityServerNet6
                          ClientId = "catalog_service_client_full",
                          AllowedGrantTypes = GrantTypes.ClientCredentials,
                          ClientSecrets = { new Secret("secret2".Sha256()) },
-                         AllowedScopes = new List<string> { IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, "catalog.api.full", "catalog.api.read", "catalog.api.write"},
-                         AlwaysSendClientClaims = true,
-                         AlwaysIncludeUserClaimsInIdToken = true
+                         AllowedScopes = new List<string> { "catalog.api.full", "catalog.api.read", "catalog.api.write"},
+                    },
+                    new Client
+                    {
+                         ClientName = "UserClient",
+                         ClientId = "user_client",
+                         AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                         AllowOfflineAccess = true,
+                         ClientSecrets = { new Secret("secret2".Sha256()) },
+                         AllowedScopes = new List<string> {  IdentityServerConstants.StandardScopes.OfflineAccess, IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, "catalog.api.full", "catalog.api.read", "catalog.api.write"},
+                         AccessTokenLifetime = 3600,
+                         RefreshTokenExpiration = TokenExpiration.Absolute,
+                         AbsoluteRefreshTokenLifetime = (int)(DateTime.Now.AddDays(60) - DateTime.Now).TotalSeconds,
+                         RefreshTokenUsage = TokenUsage.ReUse
                     }
                 };
         }

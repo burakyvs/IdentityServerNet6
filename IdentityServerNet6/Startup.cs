@@ -4,6 +4,7 @@ using IdentityServer4.Test;
 using IdentityServerApi.Services;
 using IdentityServerNet6.DataAccess.Contexts;
 using IdentityServerNet6.Entities;
+using IdentityServerNet6.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -45,6 +46,21 @@ namespace IdentityServerNet6
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
+            services.Configure<IdentityOptions>(options =>
+            {
+                // User Settings
+                options.User.RequireUniqueEmail = true;
+
+                // Password Settings
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+
+                // Default Lockout settings.
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+            });
+
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
             services.AddIdentityServer()
@@ -75,7 +91,10 @@ namespace IdentityServerNet6
                     options.TokenCleanupInterval = 3600;
                 })
                 .AddProfileService<ProfileService>()
-                .AddAspNetIdentity<ApplicationUser>();
+                .AddAspNetIdentity<ApplicationUser>()
+                .AddResourceOwnerValidator<ResourceOwnerPasswordValidator>();
+
+            services.AddTransient<IProfileService, ProfileService>();
 
             
 
