@@ -7,10 +7,7 @@ namespace IdentityServerNet6.DataAccess.Contexts
 {
     public class IdentityDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
-        //public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
-        //{
-        //}
-        public IdentityDbContext(DbContextOptions options) : base(options)
+        public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
         {
         }
     }

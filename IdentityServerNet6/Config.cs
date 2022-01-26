@@ -27,6 +27,19 @@ namespace IdentityServerNet6
                         Scopes = new List<string> { "catalog.api.full", "catalog.api.read", "catalog.api.write"},
                     },
                 };
+
+            public static IEnumerable<IdentityResource> IdentityResources =>
+                new List<IdentityResource>
+                {
+                     new IdentityResource(
+                        name: "openid",
+                        userClaims: new[] { "sub" },
+                        displayName: "Your user identifier"),
+                      new IdentityResource(
+                        name: "profile",
+                        userClaims: new[] { "name", "email", "website" },
+                        displayName: "Your profile data")
+                };
         }
 
         internal static class ScopeManager

@@ -18,6 +18,7 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -44,11 +45,35 @@ namespace IdentityServerNet6
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
 
+            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+
             services.AddIdentityServer()
                 .AddDeveloperSigningCredential()
-                .AddInMemoryApiResources(Config.ResourceManager.ApiResources)
-                .AddInMemoryApiScopes(Config.ScopeManager.ApiScopes)
-                .AddInMemoryClients(Config.ClientManager.Clients)
+                //.AddInMemoryApiResources(Config.ResourceManager.ApiResources)
+                //.AddInMemoryApiScopes(Config.ScopeManager.ApiScopes)
+                //.AddInMemoryClients(Config.ClientManager.Clients)
+                .AddConfigurationStore(options =>
+                {
+                    options.ConfigureDbContext = builder =>
+                        builder.UseNpgsql(Configuration.GetConnectionString("IdentityDbConnection"),
+                            sqlOptions =>
+                            {
+                                sqlOptions.MigrationsAssembly(migrationsAssembly);
+                                sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                            });
+                })
+                .AddOperationalStore(options =>
+                {
+                    options.ConfigureDbContext = builder =>
+                        builder.UseNpgsql(Configuration.GetConnectionString("IdentityDbConnection"),
+                            sqlOptions => 
+                            {
+                                sqlOptions.MigrationsAssembly(migrationsAssembly);
+                                sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                            });
+                    options.EnableTokenCleanup = true;
+                    options.TokenCleanupInterval = 3600;
+                })
                 .AddProfileService<ProfileService>()
                 .AddAspNetIdentity<ApplicationUser>();
 

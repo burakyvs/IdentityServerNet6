@@ -18,7 +18,8 @@ namespace IdentityServerNet6
 
             using (var scope = host.Services.CreateScope())
             {
-                IdentitySeedData.Seed(scope.ServiceProvider);
+                IdentitySeedData.SeedResources(scope.ServiceProvider);
+                IdentitySeedData.SeedData(scope.ServiceProvider);
             }
 
             host.Run();
