@@ -1,0 +1,27 @@
+version: '3.4'
+
+services:
+  identitydb:
+    container_name: identitydb
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin1234
+      - POSTGRES_DB=IdentityDb
+    restart: always
+    ports:
+        - "7556:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  identityservernet6.api:
+    container_name: identityservernet6.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ConnectionStrings__IdentityDbConnection=User ID=admin;Password=admin1234;Host=host.docker.internal;Port=7556;Database=IdentityDb;CommandTimeout=300;Timeout=50;KeepAlive=300"
+    ports:
+      - "5000:80"
+    depends_on:
+      - identitydb
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro

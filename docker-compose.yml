@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  identitydb:
+    image: postgres
+
+  identityservernet6.api:
+    image: ${DOCKER_REGISTRY-}identityservernet6
+    build:
+      context: .
+      dockerfile: IdentityServerNet6/Dockerfile
+volumes:
+  postgres_data:
