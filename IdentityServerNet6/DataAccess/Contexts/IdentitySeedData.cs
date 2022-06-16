@@ -12,6 +12,7 @@ namespace IdentityServerNet6.DataAccess.Contexts
         {
             using (var dbContext = serviceProvider.GetRequiredService<IdentityDbContext>())
             {
+                dbContext.Database.EnsureCreated();
                 dbContext.Database.Migrate();
 
                 var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -27,11 +28,14 @@ namespace IdentityServerNet6.DataAccess.Contexts
         {
             using (var persistedDbContext = serviceProvider.GetRequiredService<PersistedGrantDbContext>())
             {
+                persistedDbContext.Database.EnsureCreated();
                 persistedDbContext.Database.Migrate();
 
                 using (var configDbContext = serviceProvider.GetRequiredService<ConfigurationDbContext>())
                 {
+                    configDbContext.Database.EnsureCreated();
                     configDbContext.Database.Migrate();
+
                     if (!configDbContext.Clients.Any())
                     {
                         foreach (var client in Config.ClientManager.Clients)

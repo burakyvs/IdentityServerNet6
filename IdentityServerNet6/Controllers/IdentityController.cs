@@ -11,15 +11,13 @@ using System.Text.Json;
 namespace IdentityServerNet6.Controllers
 {
     [ApiController]
-    [Route("api/auth")]
+    [Route("auth")]
     public class IdentityController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        public IdentityController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public IdentityController(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
         }
         [HttpGet("[action]")]
         public IActionResult CheckTokenExpiration(string accessToken)

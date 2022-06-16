@@ -26,6 +26,12 @@ namespace IdentityServerNet6
                         DisplayName = "Catalog Service",
                         Scopes = new List<string> { "catalog.api.full", "catalog.api.read", "catalog.api.write"},
                     },
+                    new ApiResource
+                    {
+                        Name = "product_service_api",
+                        DisplayName = "Product Service",
+                        Scopes = new List<string> { "product.api.full", "product.api.read", "product.api.write"},
+                    },
                 };
 
             public static IEnumerable<IdentityResource> IdentityResources =>
@@ -62,6 +68,7 @@ namespace IdentityServerNet6
                         Name = "identity.api.full",
                         DisplayName = "Full Scope",
                     },
+                    // CATALOG API
                     new ApiScope
                     {
                         Name = "catalog.api.read",
@@ -75,6 +82,22 @@ namespace IdentityServerNet6
                     new ApiScope
                     {
                         Name = "catalog.api.full",
+                        DisplayName = "Full Scope",
+                    },
+                    // PRODUCT API
+                    new ApiScope
+                    {
+                        Name = "product.api.read",
+                        DisplayName = "Read Scope",
+                    },
+                    new ApiScope
+                    {
+                        Name = "product.api.write",
+                        DisplayName = "Write Scope",
+                    },
+                    new ApiScope
+                    {
+                        Name = "product.api.full",
                         DisplayName = "Full Scope",
                     }
                 };
@@ -108,7 +131,15 @@ namespace IdentityServerNet6
                          AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
                          AllowOfflineAccess = true,
                          ClientSecrets = { new Secret("secret2".Sha256()) },
-                         AllowedScopes = new List<string> {  IdentityServerConstants.StandardScopes.OfflineAccess, IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, "catalog.api.full", "catalog.api.read", "catalog.api.write"},
+                         AllowedScopes = new List<string> {  
+                             IdentityServerConstants.StandardScopes.OfflineAccess, 
+                             IdentityServerConstants.StandardScopes.OpenId, 
+                             IdentityServerConstants.StandardScopes.Profile, 
+                             "catalog.api.read", 
+                             "catalog.api.write",
+                             "product.api.read",
+                             "product.api.write"
+                         },
                          AccessTokenLifetime = 3600,
                          RefreshTokenExpiration = TokenExpiration.Absolute,
                          AbsoluteRefreshTokenLifetime = (int)(DateTime.Now.AddDays(60) - DateTime.Now).TotalSeconds,

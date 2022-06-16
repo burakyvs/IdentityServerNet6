@@ -20,6 +20,7 @@ namespace IdentityServerApi.Services
             var isAuthenticated = _accessor.HttpContext?.User.Identity?.IsAuthenticated;
             if (isAuthenticated.HasValue && isAuthenticated.Value)
             {
+                // @TODO
                 //var claims = new List<Claim>
                 //{
                 //    _accessor.HttpContext.User.Claims.First(i => i.Type == JwtClaimTypes.Name),
