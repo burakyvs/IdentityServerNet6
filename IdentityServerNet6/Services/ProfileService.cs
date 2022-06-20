@@ -1,45 +1,69 @@
 ﻿using IdentityModel;
+using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
-using System.Collections.Generic;
+using IdentityServerNet6.Entities;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace IdentityServerApi.Services
 {
-    public class ProfileService : IProfileService
+    public sealed class ProfileService : IProfileService
     {
-        private readonly IHttpContextAccessor _accessor;
-        public ProfileService(IHttpContextAccessor accessor)
+        private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
+        private readonly UserManager<ApplicationUser> _userMgr;
+        private readonly RoleManager<ApplicationRole> _roleMgr;
+
+        public ProfileService(
+            UserManager<ApplicationUser> userMgr,
+            RoleManager<ApplicationRole> roleMgr,
+            IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory)
         {
-            _accessor = accessor;
+            _userMgr = userMgr;
+            _roleMgr = roleMgr;
+            _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
         }
 
-        public Task GetProfileDataAsync(ProfileDataRequestContext context)
+        public async Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
-            var isAuthenticated = _accessor.HttpContext?.User.Identity?.IsAuthenticated;
-            if (isAuthenticated.HasValue && isAuthenticated.Value)
+            string sub = context.Subject.GetSubjectId();
+            ApplicationUser user = await _userMgr.FindByIdAsync(sub);
+            ClaimsPrincipal userClaims = await _userClaimsPrincipalFactory.CreateAsync(user);
+
+            // gets claims from ResourceOwnerPasswordValidator, GrantValidationResult claim list.
+            //var resourceOwnerClaims = context.Subject.Claims.ToList();
+
+            // gets claims from SignUp method in IdentityController.
+            List<Claim> claims = userClaims.Claims.ToList();
+
+            // RequestedClaimTypes comes from ApiResources.
+            claims = claims.Where(claim => context.RequestedClaimTypes.Contains(claim.Type)).ToList();
+
+            // if roles has special claims. (example: admin has connect_admin_panel claim but moderator doesn't have it.)
+            if (_userMgr.SupportsUserRole)
             {
-                // @TODO
-                //var claims = new List<Claim>
-                //{
-                //    _accessor.HttpContext.User.Claims.First(i => i.Type == JwtClaimTypes.Name),
-                //    _accessor.HttpContext.User.Claims.First(i => i.Type == JwtClaimTypes.Role)
-                //};
-
-                //context.IssuedClaims.AddRange(claims);
-
-                return Task.FromResult(0);
+                IList<string> roles = await _userMgr.GetRolesAsync(user);
+                foreach (var roleName in roles)
+                {
+                    if (_roleMgr.SupportsRoleClaims)
+                    {
+                        ApplicationRole role = await _roleMgr.FindByNameAsync(roleName);
+                        if (role != null)
+                        {
+                            claims.AddRange(await _roleMgr.GetClaimsAsync(role));
+                        }
+                    }
+                }
             }
 
-            return Task.FromResult(0);
+            context.IssuedClaims = claims;
         }
 
-        public Task IsActiveAsync(IsActiveContext context)
+        public async Task IsActiveAsync(IsActiveContext context)
         {
-            context.IsActive = true;
-            var a = context.Subject;
-            return Task.FromResult(0);
+            string sub = context.Subject.GetSubjectId();
+            ApplicationUser user = await _userMgr.FindByIdAsync(sub);
+            context.IsActive = user != null;
         }
     }
 }

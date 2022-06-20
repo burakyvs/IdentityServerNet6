@@ -1,5 +1,6 @@
 ﻿using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
+using IdentityServerNet6.Constants;
 using IdentityServerNet6.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,14 @@ namespace IdentityServerNet6.DataAccess.Contexts
                 if (!userManager.Users.Any())
                 {
                     userManager.CreateAsync(new ApplicationUser { FullName = "Burak Yavas", Email = "burakyvs0@gmail.com", UserName = "burakyvs"}, "Test123.").Wait();
+                }
+
+                var roleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+
+                if (!roleManager.Roles.Any())
+                {
+                    roleManager.CreateAsync(new ApplicationRole { Name = ApplicationRoles.UserRole, NormalizedName = ApplicationRoles.UserRole.ToLowerInvariant() }).Wait();
+                    roleManager.CreateAsync(new ApplicationRole { Name = ApplicationRoles.AdminRole, NormalizedName = ApplicationRoles.AdminRole.ToLowerInvariant() }).Wait();
                 }
             }
         }

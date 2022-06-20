@@ -15,9 +15,11 @@ namespace IdentityServerNet6.Controllers
     public class IdentityController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        public IdentityController(UserManager<ApplicationUser> userManager)
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        public IdentityController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
         [HttpGet("[action]")]
         public IActionResult CheckTokenExpiration(string accessToken)
@@ -63,8 +65,10 @@ namespace IdentityServerNet6.Controllers
                 {
                     new Claim(JwtClaimTypes.Role, ApplicationRoles.UserRole),
                     new Claim(JwtClaimTypes.Email, user.Email),
-                    new Claim(JwtClaimTypes.Name, user.UserName)
-                }); 
+                    new Claim(JwtClaimTypes.Name, user.FullName)
+                });
+
+                await _userManager.AddToRoleAsync(user, ApplicationRoles.UserRole);
 
                 var response = new
                 {

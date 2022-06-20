@@ -1,4 +1,5 @@
-﻿using IdentityServer4;
+﻿using IdentityModel;
+using IdentityServer4;
 using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
@@ -25,12 +26,28 @@ namespace IdentityServerNet6
                         Name = "catalog_service_api",
                         DisplayName = "Catalog Service",
                         Scopes = new List<string> { "catalog.api.full", "catalog.api.read", "catalog.api.write"},
+                        UserClaims = {
+                            JwtClaimTypes.Subject,
+                            JwtClaimTypes.Role,
+                            JwtClaimTypes.Email,
+                            JwtClaimTypes.EmailVerified,
+                            JwtClaimTypes.Name,
+                            JwtClaimTypes.PreferredUserName
+                        }
                     },
                     new ApiResource
                     {
                         Name = "product_service_api",
                         DisplayName = "Product Service",
                         Scopes = new List<string> { "product.api.full", "product.api.read", "product.api.write"},
+                        UserClaims = {
+                            JwtClaimTypes.Subject,
+                            JwtClaimTypes.Role,
+                            JwtClaimTypes.Email,
+                            JwtClaimTypes.EmailVerified,
+                            JwtClaimTypes.Name,
+                            JwtClaimTypes.PreferredUserName
+                        }
                     },
                 };
 
