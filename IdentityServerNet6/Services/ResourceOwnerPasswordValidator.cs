@@ -70,7 +70,7 @@ namespace IdentityServerNet6.Services
             //    AuthenticationTime = DateTime.Now
             //});
 
-            context.Result = new GrantValidationResult(existUser.Id.ToString(), OidcConstants.AuthenticationMethods.Password, claims_list);
+            context.Result = new GrantValidationResult(existUser.Id.ToString(), OidcConstants.AuthenticationMethods.Password);
         }
     }
 }
